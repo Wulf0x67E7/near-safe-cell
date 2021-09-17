@@ -1,7 +1,12 @@
 [package]
 name = "near_safe_cell"
-description = "A more ergonomic 'UnsafeCell' wrapper/replacement."
 version = "0.1.0"
 edition = "2018"
+
+description = "A more ergonomic 'UnsafeCell' wrapper/replacement."
+keywords = ["cell", "unsafecell", "interior-mutability"]
+categories = ["rust-patterns"]
+
 authors = ["Wulf0x67E7 (@https://github.com/Wulf0x67E7)"]
+repository = "https://github.com/Wulf0x67E7/near_safe_cell"
 license = "MIT OR Apache-2.0"
