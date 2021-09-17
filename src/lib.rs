@@ -1,11 +1,12 @@
+#![deny(warnings, clippy::all, missing_docs)]
+#![doc = include_str!("../Readme.md")]
+
 use std::{
     cell::UnsafeCell,
     ops::{Deref, DerefMut},
 };
-/// A slightly more ergonomic `UnsafeCell` replacement.
-///
-/// Allows you to safely and easily get a `&T` from a `&NearSafeCell<T>`
-/// without having to use the trivially safe `unsafe{ &*unsafe_cell.get() }` of the standard `UnsafeCell`.
+
+/// A more ergonomic `UnsafeCell` replacement.
 pub struct NearSafeCell<T>(UnsafeCell<T>);
 impl<T> NearSafeCell<T> {
     /// Constructs a new `NearSafeCell` wrapping a `T`.
@@ -18,7 +19,7 @@ impl<T> NearSafeCell<T> {
     }
     /// Returns a `&mut T` to the wrapped `T`, bypassing the borrow checker.
     /// # Safety
-    /// There exists no `&T` or `&mut T` to the wrapped `T` currently and until the returned `&mut T` is dropped.
+    /// There exists no other `&T` or `&mut T` to the wrapped `T` currently and until the returned `&mut T` is dropped.
     pub unsafe fn get_mut_unsafe(&self) -> &mut T {
         &mut *self.get_mut_ptr()
     }

@@ -1,6 +1,5 @@
 [package]
+authors = ["Wulf0x67E7 (@https://github.com/Wulf0x67E7)"]
 name = "near_safe_cell"
 version = "0.1.0"
 edition = "2018"
-
-[dependencies]
