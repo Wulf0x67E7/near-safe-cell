@@ -4,11 +4,20 @@
 
 use core::{
     cell::UnsafeCell,
+    default::Default,
+    fmt::{Debug, Display},
     ops::{Deref, DerefMut},
 };
 
 /// A more ergonomic [`UnsafeCell`] replacement.
 pub struct NearSafeCell<T>(UnsafeCell<T>);
+
+impl<T: Default> Default for NearSafeCell<T> {
+    fn default() -> Self {
+        Self::new(T::default())
+    }
+}
+
 impl<T> NearSafeCell<T> {
     /// Constructs a new [`NearSafeCell`] wrapping a `T`.
     pub const fn new(val: T) -> Self {
@@ -42,22 +51,26 @@ impl<T> NearSafeCell<T> {
         self.0.get()
     }
 }
-impl<T: Default> Default for NearSafeCell<T> {
-    /// Constructs a new [`NearSafeCell`] wrapping the default of `T`.
-    fn default() -> Self {
-        Self::new(T::default())
-    }
-}
+
 impl<T> Deref for NearSafeCell<T> {
     type Target = T;
-    /// Returns a `&T` to the wrapped `T`.
     fn deref(&self) -> &Self::Target {
         self.get()
     }
 }
 impl<T> DerefMut for NearSafeCell<T> {
-    /// Returns a `&mut T` to the wrapped `T`.
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.get_mut()
+    }
+}
+
+impl<T: Display> Display for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_fmt(format_args!("{}", self.get()))
+    }
+}
+impl<T: Debug> Debug for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_tuple("NearSafeCell").field(self.get()).finish()
     }
 }

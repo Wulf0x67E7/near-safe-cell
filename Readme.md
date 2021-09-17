@@ -10,8 +10,17 @@ The standard [`UnsafeCell`](std::cell::UnsafeCell)-Api isn't great to work with 
 ```rust
 use near_safe_cell::NearSafeCell;
 
-// You can also use [`NearSafeCell::<T: Default>::default`](NearSafeCell::default).
-let mut cell: NearSafeCell<usize> = NearSafeCell::new(24);
+// Implements [`Default`](core::default::Default)
+let mut cell: NearSafeCell<usize> = NearSafeCell::default();
+cell = NearSafeCell::new(24);
+
+// Implements [`Display`](core::fmt::Display)/[`Debug`](core::fmt::Debug)
+assert_eq!(format!("{}", cell), "24");
+assert_eq!(format!("{:?}", cell), "NearSafeCell(24)");
+
+// Implements [`Deref`](core::ops::Deref)/[`DerefMut`](core::ops::DerefMut)
+assert_eq!(&*cell, &24);
+assert_eq!(&mut *cell, &mut 24);
 
 // You can still get pointers.
 let const_ptr: *const usize = cell.get_ptr(); // &self
@@ -33,10 +42,6 @@ assert_eq!(shared, shared2);
 let mutable: &mut usize = cell.get_mut(); // &mut self
 assert_eq!(mutable, &mut 42);
 *mutable = 242;
-
-// Implements [`Deref`]/[`DerefMut`]
-assert_eq!(&*cell, &242);
-assert_eq!(&mut *cell, &mut 242);
 
 // Consuming the cell to get the value.
 let value: usize = cell.unwrap(); // self
