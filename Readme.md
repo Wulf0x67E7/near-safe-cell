@@ -1,24 +1,24 @@
 # `NearSafeCell`, a more ergonomic `UnsafeCell` wrapper/replacement.
 ## Rational:
-The standard [`UnsafeCell`](std::cell::UnsafeCell)-Api isn't great to work with in some situations.
-- You have no way to get a `&T` from an [`&UnsafeCell<T>`](std::cell::UnsafeCell) without using the trivially and always safe `unsafe{ &*cell.get() };`.
-- [`UnsafeCell::get`](std::cell::UnsafeCell::get) returns a `&mut T`, which has to be unsafely de- and re-referenced to use anyway, so why not just return a reference and make the function itself unsafe?
-- [`UnsafeCell::get`](std::cell::UnsafeCell::get) is named confusingly and inconsistently with itself and the rest of the standard library - it should really be called `UnsafeCell::get_mut_ptr`.
-- If you do actually just need a pointer (e.g. as a map key) you could simple use `<&self as *const T`. No need for an [`UnsafeCell`](std::cell::UnsafeCell) at all.
+The standard `UnsafeCell`-Api isn't great to work with in some situations.
+- You have no way to get a `&T` from an `&UnsafeCell<T>` without using the trivially and always safe `unsafe{ &*cell.get() };`.
+- `UnsafeCell::get` returns a `&mut T`, which has to be unsafely de- and re-referenced to use anyway, so why not just return a reference and make the function itself unsafe?
+- `UnsafeCell::get` is named confusingly and inconsistently with itself and the rest of the standard library - it should really be called `UnsafeCell::get_mut_ptr`.
+- If you do actually just need a pointer (e.g. as a map key) you could simple use `&self as *const T`. No need for an `UnsafeCell` at all.
 
 ## Usage:
 ```rust
 use near_safe_cell::NearSafeCell;
 
-// Implements [`Default`](core::default::Default)
+// Implements 'Default'
 let mut cell: NearSafeCell<usize> = NearSafeCell::default();
 cell = NearSafeCell::new(24);
 
-// Implements [`Display`](core::fmt::Display)/[`Debug`](core::fmt::Debug)
+// Implements 'Display' and 'Debug'
 assert_eq!(format!("{}", cell), "24");
 assert_eq!(format!("{:?}", cell), "NearSafeCell(24)");
 
-// Implements [`Deref`](core::ops::Deref)/[`DerefMut`](core::ops::DerefMut)
+// Implements 'Deref' and 'DerefMut'
 assert_eq!(&*cell, &24);
 assert_eq!(&mut *cell, &mut 24);
 
