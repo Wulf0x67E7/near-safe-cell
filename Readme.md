@@ -14,8 +14,8 @@ use near_safe_cell::NearSafeCell;
 let mut cell: NearSafeCell<usize> = NearSafeCell::default();
 cell = NearSafeCell::new(24);
 
-// Implements 'Display' and 'Debug'
-assert_eq!(format!("{}", cell), "24");
+// Implements all Formatting traits
+assert_eq!(format!("{:b}", cell), "11000");
 assert_eq!(format!("{:?}", cell), "NearSafeCell(24)");
 
 // Implements 'Deref' and 'DerefMut'

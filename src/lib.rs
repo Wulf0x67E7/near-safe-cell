@@ -1,11 +1,17 @@
 #![no_std]
-#![deny(warnings, missing_docs, clippy::all)]
+#![deny(
+    warnings,
+    missing_docs,
+    missing_debug_implementations,
+    clippy::all,
+    clippy::pedantic
+)]
 #![doc = include_str!("../Readme.md")]
 
 use core::{
     cell::UnsafeCell,
     default::Default,
-    fmt::{Debug, Display},
+    fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, UpperExp, UpperHex},
     ops::{Deref, DerefMut},
 };
 
@@ -64,13 +70,49 @@ impl<T> DerefMut for NearSafeCell<T> {
     }
 }
 
-impl<T: Display> Display for NearSafeCell<T> {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.write_fmt(format_args!("{}", self.get()))
-    }
-}
 impl<T: Debug> Debug for NearSafeCell<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("NearSafeCell").field(self.get()).finish()
+    }
+}
+
+impl<T: Display> Display for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.get().fmt(f)
+    }
+}
+impl<T: Octal> Octal for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.get().fmt(f)
+    }
+}
+impl<T: LowerHex> LowerHex for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.get().fmt(f)
+    }
+}
+impl<T: UpperHex> UpperHex for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.get().fmt(f)
+    }
+}
+impl<T: Pointer> Pointer for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.get().fmt(f)
+    }
+}
+impl<T: Binary> Binary for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.get().fmt(f)
+    }
+}
+impl<T: LowerExp> LowerExp for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.get().fmt(f)
+    }
+}
+impl<T: UpperExp> UpperExp for NearSafeCell<T> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.get().fmt(f)
     }
 }
