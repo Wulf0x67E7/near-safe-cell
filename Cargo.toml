@@ -1,5 +1,7 @@
 [package]
-authors = ["Wulf0x67E7 (@https://github.com/Wulf0x67E7)"]
 name = "near_safe_cell"
+description = "A more ergonomic 'UnsafeCell' wrapper/replacement."
 version = "0.1.0"
 edition = "2018"
+authors = ["Wulf0x67E7 (@https://github.com/Wulf0x67E7)"]
+license = "MIT OR Apache-2.0"
