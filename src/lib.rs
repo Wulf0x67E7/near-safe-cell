@@ -1,7 +1,8 @@
+#![no_std]
 #![deny(warnings, missing_docs, clippy::all)]
 #![doc = include_str!("../Readme.md")]
 
-use std::{
+use core::{
     cell::UnsafeCell,
     ops::{Deref, DerefMut},
 };
