@@ -1,4 +1,4 @@
-#![deny(warnings, clippy::all, missing_docs)]
+#![deny(warnings, missing_docs, clippy::all)]
 #![doc = include_str!("../Readme.md")]
 
 use std::{
@@ -6,14 +6,14 @@ use std::{
     ops::{Deref, DerefMut},
 };
 
-/// A more ergonomic `UnsafeCell` replacement.
+/// A more ergonomic [`UnsafeCell`] replacement.
 pub struct NearSafeCell<T>(UnsafeCell<T>);
 impl<T> NearSafeCell<T> {
-    /// Constructs a new `NearSafeCell` wrapping a `T`.
+    /// Constructs a new [`NearSafeCell`] wrapping a `T`.
     pub const fn new(val: T) -> Self {
         Self(UnsafeCell::new(val))
     }
-    /// Consumes this `NearSafeCell`, returning the wrapped `T`.
+    /// Consumes this [`NearSafeCell`], returning the wrapped `T`.
     pub fn unwrap(self) -> T {
         self.0.into_inner()
     }
@@ -42,7 +42,7 @@ impl<T> NearSafeCell<T> {
     }
 }
 impl<T: Default> Default for NearSafeCell<T> {
-    /// Constructs a new `NearSafeCell` wrapping the default of `T`.
+    /// Constructs a new [`NearSafeCell`] wrapping the default of `T`.
     fn default() -> Self {
         Self::new(T::default())
     }
