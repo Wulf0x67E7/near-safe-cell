@@ -118,7 +118,7 @@ impl<T: UpperExp> UpperExp for NearSafeCell<T> {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]
@@ -127,8 +127,8 @@ mod test {
         assert_eq!(cell.get(), &usize::default());
         cell = NearSafeCell::new(24);
 
-        let _const_ptr = cell.get_ptr();
-        let _mut_ptr = cell.get_mut_ptr();
+        assert_eq!(cell.get_ptr(), cell.get() as *const _);
+        assert_eq!(cell.get_mut_ptr(), cell.get_mut() as *mut _);
 
         assert_eq!(cell.deref(), &24);
         assert_eq!(cell.deref_mut(), &mut 24);
