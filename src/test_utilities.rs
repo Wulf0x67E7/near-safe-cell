@@ -1,7 +1,9 @@
+#[cfg(test)]
 struct Buffer<'a> {
     buffer: &'a mut [u8],
     used: usize,
 }
+#[cfg(test)]
 impl<'a> Buffer<'a> {
     fn new(buffer: &'a mut [u8]) -> Self {
         Buffer { buffer, used: 0 }
@@ -14,6 +16,7 @@ impl<'a> Buffer<'a> {
         }
     }
 }
+#[cfg(test)]
 impl<'a> core::fmt::Write for Buffer<'a> {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         if self.used > self.buffer.len() {
@@ -31,6 +34,7 @@ impl<'a> core::fmt::Write for Buffer<'a> {
         }
     }
 }
+#[cfg(test)]
 fn format<'a>(
     buffer: &'a mut [u8],
     args: core::fmt::Arguments,
