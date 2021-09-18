@@ -8,9 +8,6 @@
 )]
 #![doc = include_str!("../Readme.md")]
 
-#[cfg(test)]
-mod test_utilities;
-
 use core::{
     cell::UnsafeCell,
     default::Default,
@@ -126,7 +123,9 @@ mod test {
 
     #[test]
     fn usage() {
-        let mut cell = NearSafeCell::new(24);
+        let mut cell = NearSafeCell::<usize>::default();
+        assert_eq!(cell.get(), &usize::default());
+        cell = NearSafeCell::new(24);
 
         let _const_ptr = cell.get_ptr();
         let _mut_ptr = cell.get_mut_ptr();
@@ -151,9 +150,10 @@ mod test {
         let value = cell.unwrap();
         assert_eq!(value, 242);
     }
+
+    include!("test_utilities.rs");
     #[test]
     fn formatting() {
-        use crate::test_utilities::*;
         let mut buffer = [0u8; 32];
         let cell = NearSafeCell::new(42);
         assert_eq!(

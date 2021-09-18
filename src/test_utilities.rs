@@ -1,14 +1,12 @@
-#[cfg(test)]
-pub(crate) struct Buffer<'a> {
+struct Buffer<'a> {
     buffer: &'a mut [u8],
     used: usize,
 }
-#[cfg(test)]
 impl<'a> Buffer<'a> {
-    pub(crate) fn new(buffer: &'a mut [u8]) -> Self {
+    fn new(buffer: &'a mut [u8]) -> Self {
         Buffer { buffer, used: 0 }
     }
-    pub(crate) fn as_str(self) -> Option<&'a str> {
+    fn as_str(self) -> Option<&'a str> {
         if self.used <= self.buffer.len() {
             Some(unsafe { core::str::from_utf8_unchecked(&self.buffer[..self.used]) })
         } else {
@@ -16,7 +14,6 @@ impl<'a> Buffer<'a> {
         }
     }
 }
-#[cfg(test)]
 impl<'a> core::fmt::Write for Buffer<'a> {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         if self.used > self.buffer.len() {
@@ -34,8 +31,7 @@ impl<'a> core::fmt::Write for Buffer<'a> {
         }
     }
 }
-#[cfg(test)]
-pub(crate) fn format<'a>(
+fn format<'a>(
     buffer: &'a mut [u8],
     args: core::fmt::Arguments,
 ) -> core::result::Result<&'a str, core::fmt::Error> {
