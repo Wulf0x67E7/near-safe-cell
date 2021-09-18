@@ -1,5 +1,6 @@
 [![build](https://github.com/Wulf0x67E7/near-safe-cell/workflows/build/badge.svg)](https://github.com/Wulf0x67E7/near-safe-cell/actions)
 [![test](https://github.com/Wulf0x67E7/near-safe-cell/workflows/test/badge.svg)](https://github.com/Wulf0x67E7/near-safe-cell/actions)
+[![codecov](https://codecov.io/gh/Wulf0x67E7/near-safe-cell/branch/main/graph/badge.svg?token=MPEI5ZWY57)](https://codecov.io/gh/Wulf0x67E7/near-safe-cell)
 [![docs](https://docs.rs/near-safe-cell/badge.svg)](https://docs.rs/near-safe-cell/)
 [![crates.io](https://img.shields.io/crates/v/near-safe-cell.svg)](https://crates.io/crates/near-safe-cell)
 # `NearSafeCell`, a more ergonomic `UnsafeCell` wrapper/replacement.

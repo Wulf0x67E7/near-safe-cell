@@ -8,6 +8,9 @@
 )]
 #![doc = include_str!("../Readme.md")]
 
+#[cfg(test)]
+mod test_utilities;
+
 use core::{
     cell::UnsafeCell,
     default::Default,
@@ -114,5 +117,78 @@ impl<T: LowerExp> LowerExp for NearSafeCell<T> {
 impl<T: UpperExp> UpperExp for NearSafeCell<T> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.get().fmt(f)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn usage() {
+        let mut cell = NearSafeCell::new(24);
+
+        let _const_ptr = cell.get_ptr();
+        let _mut_ptr = cell.get_mut_ptr();
+
+        assert_eq!(cell.deref(), &24);
+        assert_eq!(cell.deref_mut(), &mut 24);
+
+        let interiorly_mutable = unsafe { cell.get_mut_unsafe() };
+        assert_eq!(interiorly_mutable, &mut 24);
+        *interiorly_mutable = 42;
+        drop(interiorly_mutable);
+
+        let shared = cell.get();
+        let shared2 = cell.get();
+        assert_eq!(shared, &42);
+        assert_eq!(shared, shared2);
+
+        let mutable = cell.get_mut();
+        assert_eq!(mutable, &mut 42);
+        *mutable = 242;
+
+        let value = cell.unwrap();
+        assert_eq!(value, 242);
+    }
+    #[test]
+    fn formatting() {
+        use crate::test_utilities::*;
+        let mut buffer = [0u8; 32];
+        let cell = NearSafeCell::new(42);
+        assert_eq!(
+            format(&mut buffer, format_args!("{:?}", cell)).unwrap(),
+            "NearSafeCell(42)"
+        );
+        assert_eq!(format(&mut buffer, format_args!("{}", cell)).unwrap(), "42");
+        assert_eq!(
+            format(&mut buffer, format_args!("{:o}", cell)).unwrap(),
+            "52"
+        );
+        assert_eq!(
+            format(&mut buffer, format_args!("{:x}", cell)).unwrap(),
+            "2a"
+        );
+        assert_eq!(
+            format(&mut buffer, format_args!("{:X}", cell)).unwrap(),
+            "2A"
+        );
+        assert_eq!(
+            format(&mut buffer, format_args!("{:b}", cell)).unwrap(),
+            "101010"
+        );
+        assert_eq!(
+            format(&mut buffer, format_args!("{:e}", cell)).unwrap(),
+            "4.2e1"
+        );
+        assert_eq!(
+            format(&mut buffer, format_args!("{:E}", cell)).unwrap(),
+            "4.2E1"
+        );
+        let cell = NearSafeCell::new(42 as *const u8);
+        assert_eq!(
+            format(&mut buffer, format_args!("{:p}", cell)).unwrap(),
+            "0x2a"
+        );
     }
 }
