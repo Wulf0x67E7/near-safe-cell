@@ -1,6 +1,6 @@
 [package]
 name = "near-safe-cell"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2018"
 
 description = "A more ergonomic 'UnsafeCell' wrapper/replacement."
