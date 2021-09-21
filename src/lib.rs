@@ -18,10 +18,10 @@ use core::{
 
 /// A more ergonomic [`UnsafeCell`] replacement.
 ///
-/// Note that unlike [`UnsafeCell<T>`], [`NearSafeCell<T>`] does implement [`Sync`] where `T: Sync`.
+/// Note that unlike [`UnsafeCell<T>`], [`NearSafeCell<T>`] does implement [`Sync`]\(and [`RefUnwindSafe`](std::panic::RefUnwindSafe) if std is enabled) where `T: Sync`.
 /// This is because the only way to break its safety is by either calling [`NearSafeCell::get_mut_unsafe`](NearSafeCell::get_mut_unsafe)
 /// or dereferencing the pointer from [`NearSafeCell::get_(mut_)ptr`](NearSafeCell::get_ptr),
-/// both of which are themselves unsafe and have identical safety requirements that, if properly upheld, still guarantee safety.
+/// both of which are themselves unsafe and have identical safety requirements that, if upheld properly, still guarantee [`Sync`] correctness.
 pub struct NearSafeCell<T>(UnsafeCell<T>);
 
 impl<T: Default> Default for NearSafeCell<T> {
@@ -69,6 +69,15 @@ impl<T> NearSafeCell<T> {
 // violated [`NearSafeCell::get_mut_unsafe`](NearSafeCell::get_mut_unsafe)s safety requirements,
 // at which point the fault lies with us and not this impl.
 unsafe impl<T: Sync> Sync for NearSafeCell<T> {}
+
+// # Safety
+// The only way this impl could be unsafe would be if we
+// violated [`NearSafeCell::get_mut_unsafe`](NearSafeCell::get_mut_unsafe)s safety requirements,
+// at which point the fault lies with us and not this impl.
+#[cfg(feature = "std")]
+use std::panic::RefUnwindSafe;
+#[cfg(feature = "std")]
+unsafe impl<T: RefUnwindSafe> RefUnwindSafe for NearSafeCell<T> {}
 
 impl<T> AsRef<T> for NearSafeCell<T> {
     fn as_ref(&self) -> &T {
