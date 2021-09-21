@@ -23,7 +23,9 @@ cell = NearSafeCell::new(24);
 assert_eq!(format!("{:b}", cell), "11000");
 assert_eq!(format!("{:?}", cell), "NearSafeCell(24)");
 
-// Implements 'Deref' and 'DerefMut'
+// Implements 'AsRef', 'AsMut', 'Deref' and 'DerefMut'
+assert_eq!(cell.as_ref(), &24);
+assert_eq!(cell.as_mut(), &mut 24);
 assert_eq!(&*cell, &24);
 assert_eq!(&mut *cell, &mut 24);
 

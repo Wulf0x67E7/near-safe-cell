@@ -3,6 +3,7 @@
     warnings,
     missing_docs,
     missing_debug_implementations,
+    rustdoc::broken_intra_doc_links,
     clippy::all,
     clippy::pedantic
 )]
@@ -16,6 +17,11 @@ use core::{
 };
 
 /// A more ergonomic [`UnsafeCell`] replacement.
+///
+/// Note that unlike [`UnsafeCell<T>`], [`NearSafeCell<T>`] does implement [`Sync`] where `T: Sync`.
+/// This is because the only way to break its safety is by either calling [`NearSafeCell::get_mut_unsafe`](NearSafeCell::get_mut_unsafe)
+/// or dereferencing the pointer from [`NearSafeCell::get_(mut_)ptr`](NearSafeCell::get_ptr),
+/// both of which are themselves unsafe and have identical safety requirements that, if properly upheld, still guarantee safety.
 pub struct NearSafeCell<T>(UnsafeCell<T>);
 
 impl<T: Default> Default for NearSafeCell<T> {
@@ -55,6 +61,23 @@ impl<T> NearSafeCell<T> {
     /// Returns a `*mut T` to the wrapped `T`.
     pub const fn get_mut_ptr(&self) -> *mut T {
         self.0.get()
+    }
+}
+
+// # Safety
+// The only way this impl could be unsafe would be if we
+// violated [`NearSafeCell::get_mut_unsafe`](NearSafeCell::get_mut_unsafe)s safety requirements,
+// at which point the fault lies with us and not this impl.
+unsafe impl<T: Sync> Sync for NearSafeCell<T> {}
+
+impl<T> AsRef<T> for NearSafeCell<T> {
+    fn as_ref(&self) -> &T {
+        self.get()
+    }
+}
+impl<T> AsMut<T> for NearSafeCell<T> {
+    fn as_mut(&mut self) -> &mut T {
+        self.get_mut()
     }
 }
 
@@ -120,6 +143,7 @@ impl<T: UpperExp> UpperExp for NearSafeCell<T> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use core::ops::{Deref, DerefMut};
 
     #[test]
     fn usage() {
@@ -130,6 +154,8 @@ mod tests {
         assert_eq!(cell.get_ptr(), cell.get() as *const _);
         assert_eq!(cell.get_mut_ptr(), cell.get_mut() as *mut _);
 
+        assert_eq!(cell.as_ref(), &24);
+        assert_eq!(cell.as_mut(), &mut 24);
         assert_eq!(cell.deref(), &24);
         assert_eq!(cell.deref_mut(), &mut 24);
 
@@ -147,8 +173,7 @@ mod tests {
         assert_eq!(mutable, &mut 42);
         *mutable = 242;
 
-        let value = cell.unwrap();
-        assert_eq!(value, 242);
+        assert_eq!(cell.unwrap(), 242);
     }
 
     include!("test_utilities.rs");
