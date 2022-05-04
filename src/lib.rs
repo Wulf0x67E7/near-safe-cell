@@ -13,7 +13,7 @@ use core::{
     cell::UnsafeCell,
     default::Default,
     fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, UpperExp, UpperHex},
-    ops::{Deref, DerefMut},
+    ops::{Deref, DerefMut, IndexMut},
 };
 
 /// A more ergonomic [`UnsafeCell`] replacement.
@@ -44,6 +44,17 @@ impl<T> NearSafeCell<T> {
     /// There exists no other `&T` or `&mut T` to the wrapped `T` currently and until the returned `&mut T` is dropped.
     pub unsafe fn get_mut_unsafe(&self) -> &mut T {
         &mut *self.get_mut_ptr()
+    }
+    /// Returns a `&mut T::Output` to a part of the wrapped `T` indexed by `Idx`.
+    /// Helps avoiding having to even temporarily [`Self::get_mut_unsafe`] the whole T
+    /// just to get a subset of it, making it easier and more obvious to uphold the aliasing rules.
+    /// # Safety
+    /// There exists no other `&T` or `&mut T` the the whole wrapped `T`, nor to the `T::Output` part of it we are trying to index to.
+    pub unsafe fn index_mut_unchecked<Idx>(&self, idx: Idx) -> &mut T::Output
+    where
+        T: IndexMut<Idx>,
+    {
+        (*self.get_mut_ptr()).index_mut(idx)
     }
     /// Returns a `&T` to the wrapped `T`.
     pub fn get(&self) -> &T {
@@ -183,6 +194,22 @@ mod tests {
         *mutable = 242;
 
         assert_eq!(cell.unwrap(), 242);
+    }
+
+    #[test]
+    fn indexing() {
+        use core::ops::Index;
+        let cell = NearSafeCell::new([1, 2, 3, 4, 5]);
+        {
+            let sub_0 = cell.index(2..);
+            let sub_1 = unsafe { cell.index_mut_unchecked(..2) };
+            assert_eq!(sub_0, [3, 4, 5]);
+            assert_eq!(sub_1, [1, 2]);
+            sub_1.copy_from_slice(&[24, 42]);
+            assert_eq!(sub_0, [3, 4, 5]);
+            assert_eq!(sub_1, [24, 42]);
+        }
+        assert_eq!(cell.unwrap(), [24, 42, 3, 4, 5]);
     }
 
     include!("test_utilities.rs");
